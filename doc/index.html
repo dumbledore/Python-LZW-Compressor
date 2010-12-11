@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>LZW Compression for Python</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+li.main{margin: 16px 0px}
+</style>
+</head>
+<body>
+<h1>Документация</h1>
+<h2>Общо за проекта</h2>
+<p>
+Проектът реализира алгоритъма за компресия LZW, като се полза 64K или 16MB речник. При запълване речникът се изпразва и пълни наново. За повече информация по алгоритъма вижте <a href="lzw.html">тук</a>.
+</p>
+<p>
+Проектът е разработен от <i>Светлин Анков</i>
+</p>
+<h2>Структура на проекта</h2>
+<ul>
+<li class="main"><b>compress</b> – Реализира компресията. Изпълнява се чрез извикване като метод или от command prompt-а. При извикване без параметри ще даде хелп.
+	<ul>
+	<li><i>process_command_line(arguments, automated = False)</i> – Обработва аргументите от CMD</li>
+	<li><i>compress(file_in, file_out, buffer_size, large_dict)</i> – Инициализира компресията</li>
+	<li><i>compress_more(f, o, buffer_size, dict_size_large, flen, read_overall, t)</i> – Реализира самата компресия. Работи докато речника се запълни или входния буфер се запълни. Викан многократно от <i>compress</i> докато файлът бъде прочетен. При всяко извикване речникът се прави наново.</li>
+	<li><i>output_code_for_pattern_to_disc(buffer_writer, position, o)</i> – Записва output буфера на диска.</li>
+	<li><i>output_code_for_pattern(buffer_writer, position, code, large_dict)</i> – Записва код в текущия буфер.</li>
+	</ul>
+</li>
+<li class="main"><b>decompress</b> – Реализира <b>де</b>компресията. Изпълнява се чрез извикване като метод или от command prompt-а. При извикване без параметри ще даде хелп.
+	<ul>
+		<li><i>process_command_line(arguments, automated = False)</i> – Обработва аргументите от CMD</li>
+		<li><i>decompress(file_in, file_out, buffer_size, large_dict)</i> – Инициализира декомпресията. Проверява дали файлът започва с магическия код, ако не хвърля <i>ArchiveError</i>. </li>
+		<li><i>decompress_more(f, o, buffer_size, dict_size_large, flen, read_overall, t)</i> – Реализира самата декомпресия. Работи докато няма повече за четене или е прочетена команда „FLUSH DICTIONARY“. Викан многократно от <i>decompress</i> докато файлът бъде прочетен. При всяко извикване речникът се прави наново.</li>
+		<li><i>def get_input_code(f, large_dict)</i> – Прочита един (дву или три байтов) код.</li>
+		<li><i>def output_pattern_for_code(o, pattern)</i> – За момента просто записва шаблон на диска.</li>
+	</ul>
+</li>
+<li class="main"><b>constants</b> – Съдържа константи ползвани при декомпресията и компресията.</li>
+<li class="main"><b>compare_files</b> – Сравнява файлове байт по байт. Използва се от Unit тестовете.</li>
+<li class="main"><b>test_*</b> – Тестове
+<ul>
+	<li class="main"><b>test_compression_*</b> – Тестове, които компресират и декомпресират файлове от различни формати и размери, ползвайки различен буфер и речник (следователно и дължина на кодовете). Целта е оригиналът и декомпресияраният от компресирания да са еднакви, като за тази цел ползва <i>compare_files</i>
+		<ul>
+			<li><b>test_compression_basic</b> – Тества със случайни изрязъци от wiki.xml-а. Общо взето занимава се с малка файлове</li>
+			<li><b>test_compression_additional</b> – Допълнителен тест върху файлове от различни типове.</li>
+			<li><b>test_compression_wiki</b> – Тест за компресия на BG WikiDUMP, като ползва най-тежките настройки. Освен Sanity Check, проверява дали е достигнато изисканото ниво на компресия (30%)</li>
+		</ul>
+	</li>
+	<li class="main"><b>test_bad_file</b> – Пробва да зададе на декомпресора файл, който не е от LZW формат.</li>
+</ul>
+<li class="main"><b>testdata\</b> – Данните за тестовете</li>
+<li class="main"><b>doc\</b> – Тази докемунтация</li>
+
+</ul>
+</body>
+</html>

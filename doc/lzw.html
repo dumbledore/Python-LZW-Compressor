@@ -1,0 +1,1007 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1251">
+<meta name=Generator content="Microsoft Word 12 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Verdana;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+@font-face
+	{font-family:"Trebuchet MS";
+	panose-1:2 11 6 3 2 2 2 2 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:10.0pt;
+	margin-left:0cm;
+	line-height:115%;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+h4
+	{mso-style-link:"Heading 4 Char";
+	margin-right:0cm;
+	margin-left:0cm;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+p
+	{margin-right:0cm;
+	margin-left:0cm;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";}
+span.apple-converted-space
+	{mso-style-name:apple-converted-space;}
+span.Heading4Char
+	{mso-style-name:"Heading 4 Char";
+	mso-style-link:"Heading 4";
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+.MsoPapDefault
+	{margin-bottom:10.0pt;
+	line-height:115%;}
+@page WordSection1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
+div.WordSection1
+	{page:WordSection1;}
+-->
+</style>
+
+</head>
+
+<body lang=BG link=blue vlink=purple>
+
+<div class=WordSection1>
+
+<h4 style='margin-top:18.0pt;margin-right:0cm;margin-bottom:12.0pt;margin-left:
+0cm'><span style='font-size:13.5pt;font-family:"Trebuchet MS","sans-serif";
+color:#333333'>The LZW Compression Algorithm</span></h4>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>&nbsp;</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>In 1978, J. Ziv and A. Lempel
+introduced the idea of sequentially gathering “phrases” from input symbols [Ziv
+and Lempel 1978]. Because the algorithm simply accumulates strings of two or
+more characters, it can run faster during compression, unlike LZ77 which has to
+perform an extensive search for the longest matching string. No sliding window
+buffer will be maintained but a “table” of strings. As the algorithm runs, new
+phrases are added to the string table with a corresponding<i>codeword</i>. When
+a string is encountered the second time, its codeword or index in the table is
+transmitted as the output code.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>A highly-improved
+implementation of the<span class=apple-converted-space>&nbsp;</span>LZ78algorithm
+was presented<span class=apple-converted-space>&nbsp;</span>in 1984<span
+class=apple-converted-space>&nbsp;</span>by T. A. Welch, naming it LZW [Welch
+1984].<span class=apple-converted-space>&nbsp;</span>The Lempel-Ziv-Welch
+compression algorithm is so designed such that the decoder must be able to
+duplicate the string table while performing the decompression process.
+Therefore, no dictionary needs to be prepared in advance or tacked into the
+compressed file since the decoder is able to perfectly duplicate the string
+table created by the compression algorithm. This remarkable property of LZW is
+its most amazing feature.</span></p>
+
+<p><b><span style='font-size:11.0pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></b></p>
+
+<p><b><span style='font-size:11.0pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>LZW Compression</span></b></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>The LZW coding algorithm<span
+class=apple-converted-space>&nbsp;</span><i>keeps on gathering strings</i>and
+testing if a particular string is already in the string table; if not, the new
+string is inserted into the table, and the index of the previous string is
+transmitted as an LZW output code. The<span class=apple-converted-space>&nbsp;</span><b>lzwcode</b><span
+class=apple-converted-space>&nbsp;</span>is usually of size 12 bits, with 4096
+possible codes.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>Since there might<span
+class=apple-converted-space>&nbsp;</span><i>not</i><span
+class=apple-converted-space>&nbsp;</span>be a match of at least a two-byte
+string, we have to output a code which must represent a single byte. Therefore,
+the first 256 codes (0..255) are reserved for the individual bytes; the
+non-matching single bytes are thus given 12 bits instead of the usual 8 bits.
+However, LZW is so effective that the next output codes will represent long
+strings, enabling better compression.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>The pseudo-code for LZW
+compression is as follows, where<span class=apple-converted-space>&nbsp;</span></span><span
+style='font-size:11.0pt;font-family:"Courier New";color:#1C2023'>&lt;&lt;pattern,
+K&gt;&gt;</span><span class=apple-converted-space><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>&nbsp;</span></span><span
+style='font-size:10.5pt;font-family:"Verdana","sans-serif";color:#1C2023'>is
+the concatenation of the string<span class=apple-converted-space>&nbsp;</span></span><span
+style='font-size:11.0pt;font-family:"Courier New";color:#1C2023'>pattern</span><span
+class=apple-converted-space><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></span><span style='font-size:10.5pt;font-family:
+"Verdana","sans-serif";color:#1C2023'>and the character<span
+class=apple-converted-space>&nbsp;</span></span><span style='font-size:11.0pt;
+font-family:"Courier New";color:#1C2023'>K</span><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>:</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>pattern = get input character</span><span style='font-size:6.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>while
+( not end-of-file ) {</span><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+K = get input character</span><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+if ( &lt;&lt;pattern, K&gt;&gt; is NOT in&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; the
+string table ){</span><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; output the code for pattern</span><span style='font-size:
+6.5pt;font-family:"Verdana","sans-serif";color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; add &lt;&lt;pattern, K&gt;&gt; to the string table</span><span
+style='font-size:6.5pt;font-family:"Verdana","sans-serif";color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; pattern = K</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp;<span class=apple-converted-space>&nbsp;</span>}</span><span
+style='font-size:6.5pt;font-family:"Verdana","sans-serif";color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+else { pattern = &lt;&lt;pattern, K&gt;&gt; }</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>}</span><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>output
+the code for pattern</span><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>output
+EOF_CODE</span></p>
+
+<p align=center style='text-align:center'><b><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>Figure 1.&nbsp;&nbsp;&nbsp;
+The LZW Compression Process</span></b></p>
+
+<p style='text-indent:14.4pt'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></p>
+
+<p style='text-indent:14.4pt'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>Let us now employ the above LZW compression algorithm to encode
+the following data source:</span></p>
+
+<p style='text-indent:14.4pt'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+<i>Source String</i>:</span></p>
+
+<p style='text-indent:14.4pt'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>YESNOHUFTHUFTHUFYHUFYHUFYHK</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>The first pattern would be the letter ‘Y’ and entering the<b>while</b><span
+class=apple-converted-space>&nbsp;</span>loop, we get the letter ‘E’.<span
+class=apple-converted-space>&nbsp;</span>Since “YE” is not in the string table,
+we quickly output the code for<span class=apple-converted-space>&nbsp;</span><i>pattern</i>;
+at this point,<span class=apple-converted-space>&nbsp;</span><i>pattern</i><span
+class=apple-converted-space>&nbsp;</span>is still the single letter ‘Y’. Then
+we add the pattern “YE” to the string table (<i>lzwcode</i><span
+class=apple-converted-space>&nbsp;</span>= 257) and assign the character ‘E’ as
+the “new” pattern.<span class=apple-converted-space>&nbsp;</span>The next
+string pattern “ES” would get a code of 258, and so on.<span
+class=apple-converted-space>&nbsp;</span>We started with code 257 since the<span
+class=apple-converted-space>&nbsp;</span><i>end-of-stream</i><span
+class=apple-converted-space>&nbsp;</span>code (EOF_CODE) is assigned the first
+available code (i.e., code 256) to allow “variable-length” codes.LZW
+compression then proceeds as shown in the table below:</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></p>
+
+<div align=center>
+
+<table class=MsoNormalTable border=1 cellpadding=0>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Pattern</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>K</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Pattern + K</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>New Code</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Output Code</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Y</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>E</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;YE&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>257</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'Y'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>E</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>S</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;ES&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>258</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'E'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>S</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>N</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;SN&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>259</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'S'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>N</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>O</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;NO&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>260</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'N'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>O</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;OH&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>261</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'O'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>U</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HU&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>262</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'H'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>U</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;UF&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>263</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'U'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>T</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;FT&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>264</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'F'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>T</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;TH&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>265</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'T'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>U</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HU&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(262)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HU</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUF&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>266</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>262</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>T</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;FT&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(264)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>FT</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;FTH&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>267</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>264</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>U</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HU&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(262)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HU</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUF&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(266)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HUF</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Y</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUFY&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>268</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>266</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Y</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;YH&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>269</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'Y'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>U</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HU&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(262)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HU</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUF&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(266)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HUF</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Y</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUFY&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(268)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HUFY</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUFYH&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>270</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>268</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>U</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HU&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(262)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HU</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>F</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUF&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(266)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HUF</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>Y</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUFY&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(268)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HUFY</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>H</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUFYH&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>(270)</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>HUFYH</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>K</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>&quot;HUFYHK&quot;</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>271</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>270?</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>K</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>{break}</p>
+  </td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>'K'</p>
+  </td>
+ </tr>
+ <tr>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'></td>
+  <td valign=top style='padding:.5pt 1.9pt .5pt 1.9pt'>
+  <p class=MsoNormal align=center style='text-align:center'>EOF_CODE</p>
+  </td>
+ </tr>
+</table>
+
+</div>
+
+<p align=center style='text-align:center;line-height:8.65pt'><span
+style='font-size:6.5pt;font-family:"Verdana","sans-serif";color:#1C2023'><br>
+</span><b><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>Figure 2.<span class=apple-converted-space>&nbsp;</span>Compressing
+the Sample Data Source</span></b></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>&nbsp;</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>As you can see from the above
+table, the entire message will be compressed by the LZW algorithm by
+transmitting codes for strings.<span class=apple-converted-space>&nbsp;</span>The
+last column shows the output codes transmitted by the compression program.
+These output codes are the<span class=apple-converted-space>&nbsp;</span><i>only</i><span
+class=apple-converted-space>&nbsp;</span>codes that will be available to the<span
+class=apple-converted-space>&nbsp;</span><i>decompression</i><span
+class=apple-converted-space>&nbsp;</span>program.</span></p>
+
+<p><b><span style='font-size:11.0pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></b></p>
+
+<p style='text-align:justify'><b><span style='font-size:11.0pt;font-family:
+"Verdana","sans-serif";color:#1C2023'>LZW Decompression</span></b><span
+class=apple-converted-space><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; The output stream, as shown in the last
+column of the table, will be the only “data” to the decompression program. The
+LZW decoder must be able to fill in or reconstruct the string table but, as the
+last column shows, the decompression algorithm is always one code behind the
+compression algorithm. For example, after receiving ‘Y’, the decompression
+program needs to receive first the second code ‘E’ before it can define the
+string “YE” into the string table, with a code of 257. This process goes on until
+all the codes are received. Thus, there can be a situation in which the
+decompression algorithm will receive a code that it has not even defined yet.
+The last transmitted string code in the table (code 270) precisely demonstrates
+this instance in a decompression process.</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;&nbsp; The question mark (?) in the table is shown to
+illustrate a special case that arises when the decoder encounters a code (to
+output strings) which is not yet defined (in this case, code 270).<span
+class=apple-converted-space>&nbsp;</span><i>This happens when the compression
+program has just defined a string and immediately sees the same string, thereby
+also quickly transmitting its code</i>. Because the decompression algorithm is
+always one code behind, it has not yet defined the code that it just received
+and hence seems to not be able to translate this new code into the correct
+string. However, this situation only occurs when a string “PATTERN” (with
+“PATTERN” already defined previously) appears<span class=apple-converted-space>&nbsp;</span><i>consecutively</i><span
+class=apple-converted-space>&nbsp;</span>in the data source and when a
+character<span class=apple-converted-space>&nbsp;</span><i>equal to the first
+letter of the string</i><span class=apple-converted-space>&nbsp;</span>(‘P’)
+immediately follows the second string. The decompression algorithm is
+particularly designed to handle this situation:</span></p>
+
+<p style='text-align:justify;line-height:8.65pt'><span style='font-size:6.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>k = PREV_CODE = get input code</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>output K&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>while ( not end-of-file ) {</span><span style='font-size:6.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+CURR_CODE = get input code</span><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'><br>
+</span><span style='font-size:9.0pt;font-family:"Courier New";color:#1C2023'>&nbsp;&nbsp;&nbsp;
+if ( CURR_CODE is the EOF_CODE ) break;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; if ( CURR_CODE is undefined ) {</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; pattern =
+string(PREV_CODE);</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; pattern = &lt;&lt;pattern,
+K&gt;&gt;<br>
+&nbsp;&nbsp;&nbsp; }</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; else { pattern = string(CURR_CODE) }</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; output pattern</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; K = first character in pattern&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; add &lt;&lt;string(PREV_CODE), K&gt;&gt; to
+the&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; string table</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; PREV_CODE = CURR_CODE</span></p>
+
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
+color:#1C2023'>}</span></p>
+
+<p align=center style='text-align:center'><b><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>Figure 3.&nbsp;&nbsp;&nbsp;
+The LZW Decompression Algorithm</span></b></p>
+
+<p style='line-height:8.65pt'><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>In the source message
+example, the string segment “HUFYHUFYHUFYH” triggers an<span
+class=apple-converted-space>&nbsp;</span><i>undefined</i><span
+class=apple-converted-space>&nbsp;</span>code (notice the three superimposed
+“HUFYH” strings).<span class=apple-converted-space>&nbsp;</span>This happens
+when the string “HUFY” is first defined as code 268 (i.e., restarting the
+search at ‘Y’, and defining the string “YH” as code 269), and is transmitted as
+output when the second “HUFYH” string is encountered by the compression
+algorithm. Then the algorithm defines code 270 for the<span
+class=apple-converted-space>&nbsp;</span><i>pattern</i><span
+class=apple-converted-space>&nbsp;</span>“HUFYH”, and starts the search at the
+last ‘H’ of this newly defined string (the second “HUFYH” string). Thus, it
+will immediately encounter the third string “HUFYH” and transmit its “newly-defined”
+code, which is 270.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><b><span style='font-size:
+10.5pt;font-family:"Verdana","sans-serif";color:#1C2023'>Complex Decoding.</span></b><span
+class=apple-converted-space><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></span><span style='font-size:10.5pt;font-family:
+"Verdana","sans-serif";color:#1C2023'>As shown in the table, when the<span
+class=apple-converted-space>&nbsp;</span><i>decompression</i><span
+class=apple-converted-space>&nbsp;</span>algorithm receives code 268, it will
+first have to define code 269. After defining code 269, however, it will
+immediately receive code 270 which it has not even defined yet into the string
+table.<span class=apple-converted-space>&nbsp;</span>The decompression
+algorithm handles this by first translating the previous code it has received
+(i.e., code 268 = &quot;HUFY&quot;), and the first character of the translated
+string (i.e., the character 'H') is then tacked to this string. Next, the
+decompressor transmits<span class=apple-converted-space>&nbsp;</span>or
+“writes”the newly-translated string<span class=apple-converted-space>&nbsp;</span>to
+the output file, and then enters it into the string table. Thus, the<span
+class=apple-converted-space>&nbsp;</span><i>unknown string</i>is always the<span
+class=apple-converted-space>&nbsp;</span><i>previous string</i><span
+class=apple-converted-space>&nbsp;</span>plus its<span
+class=apple-converted-space>&nbsp;</span><i>first character</i>.</span></p>
+
+<p><b><span style='font-size:11.0pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></b></p>
+
+<p><b><span style='font-size:11.0pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>Improving LZW Codes</span></b></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>One of the most
+important&nbsp; considerations in designing compression programs is that of
+optimizing the codelengths that are transmitted, since they are the ones that
+ultimately dictate the compression ratio of the file. The smaller the
+codewords, the smaller the resulting compressed file.</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;&nbsp;&nbsp; In line with this, we can improve LZW by
+assigning smaller codelengths at the beginning of the compression process<span
+class=apple-converted-space>&nbsp;</span>[Welch 1984]. Since at the start the<span
+class=apple-converted-space>&nbsp;</span><b>lzwcode</b>count begins with code
+256, we can assign the bit lengths to be 9 bits first (i.e., code 256 already
+requires 9 bits so this codelength will accommodate integer codes from<span
+class=apple-converted-space>&nbsp;</span>0..511),<span
+class=apple-converted-space>&nbsp;</span>and then add more bits as necessary.
+Specifically, when you have already “defined” code 512, then you should assign
+a bit length of 10 bits to properly output the new codes (512..1023).</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;&nbsp; The “variable-length” LZW coding method indeed
+requires an “increase in logic complexity” for the encoder and decoder [Welch
+1984]. Fortunately, this technique adds to the compression ratio by about 2 to
+3%, and<span class=apple-converted-space>&nbsp;</span>is definitely a welcome
+improvement.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>An “accelerated loading” of
+strings into the dictionary is also possible, with marked improvement in
+compression [Horspool 1991]. The effect in computing speed is only minimal
+compared to the benefit of added compression.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>For LZW coding, a hash data
+structure is best in terms of both<span class=apple-converted-space>&nbsp;</span><i>speed</i><span
+class=apple-converted-space>&nbsp;</span>and<span class=apple-converted-space>&nbsp;</span><i>memory</i><span
+class=apple-converted-space>&nbsp;</span>consumption. The Unix<span
+class=apple-converted-space>&nbsp;</span><i>compress</i><span
+class=apple-converted-space>&nbsp;</span>program (also known as LZC) uses
+hashing to implement LZW. The simple hash function<span
+class=apple-converted-space>&nbsp;</span>in LZC<span
+class=apple-converted-space>&nbsp;</span>(i.e., SHL + XOR) is very good, and
+the design of the probing function also teaches the reader a great deal about
+hashing in general. That is, the probing function of any hashing scheme must
+also be a function of the preceding computed hash value—to take advantage of
+the computations “already performed” by the first hash function.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>A<span
+class=apple-converted-space>&nbsp;</span><i>binary search tree</i><span
+class=apple-converted-space>&nbsp;</span>(BST) data structure, however, is
+observed to be faster than a hashing scheme, albeit consuming more memory. When
+LZW is used for very large files, the BST clearly shows its strength in speed
+over hashing.</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'></span>accommodate integer codes from<span
+class=apple-converted-space>&nbsp;</span>0..511),<span
+class=apple-converted-space>&nbsp;</span>and then add more bits as necessary.
+Specifically, when you have already “defined” code 512, then you should assign
+a bit length of 10 bits to properly output the new codes (512..1023).</span></p>
+
+<p style='text-align:justify'><span style='font-size:10.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;&nbsp; The “variable-length” LZW coding method indeed
+requires an “increase in logic complexity” for the encoder and decoder [Welch
+1984]. Fortunately, this technique adds to the compression ratio by about 2 to
+3%, and<span class=apple-converted-space>&nbsp;</span>is definitely a welcome
+improvement.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>An “accelerated loading” of
+strings into the dictionary is also possible, with marked improvement in
+compression [Horspool 1991]. The effect in computing speed is only minimal
+compared to the benefit of added compression.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>For LZW coding, a hash data
+structure is best in terms of both<span class=apple-converted-space>&nbsp;</span><i>speed</i><span
+class=apple-converted-space>&nbsp;</span>and<span class=apple-converted-space>&nbsp;</span><i>memory</i><span
+class=apple-converted-space>&nbsp;</span>consumption. The Unix<span
+class=apple-converted-space>&nbsp;</span><i>compress</i><span
+class=apple-converted-space>&nbsp;</span>program (also known as LZC) uses
+hashing to implement LZW. The simple hash function<span
+class=apple-converted-space>&nbsp;</span>in LZC<span
+class=apple-converted-space>&nbsp;</span>(i.e., SHL + XOR) is very good, and
+the design of the probing function also teaches the reader a great deal about
+hashing in general. That is, the probing function of any hashing scheme must
+also be a function of the preceding computed hash value—to take advantage of
+the computations “already performed” by the first hash function.</span></p>
+
+<p style='text-align:justify;text-indent:14.4pt'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>A<span
+class=apple-converted-space>&nbsp;</span><i>binary search tree</i><span
+class=apple-converted-space>&nbsp;</span>(BST) data structure, however, is
+observed to be faster than a hashing scheme, albeit consuming more memory. When
+LZW is used for very large files, the BST clearly shows its strength in speed
+over hashing.</span></p>
+
+<p style='line-height:8.65pt'><span style='font-size:6.5pt;font-family:"Arial","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p align=center style='text-align:center'><b><span style='font-family:"Arial","sans-serif";
+color:black'>***</span></b></p>
+
+<p><b><span style='font-family:"Arial","sans-serif";color:#009900'>References</span></b></p>
+
+<p style='margin-left:28.5pt;text-align:justify'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>1.]&nbsp;&nbsp;&nbsp; J. Ziv
+and A. Lempel, “<i>Compression of Individual Sequences via Variable-rate Coding</i>,”
+IEEE Transactions on Information Theory IT24, (1978), pp.530-536.</span></p>
+
+<p style='margin-left:28.5pt;text-align:justify'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>2.]&nbsp;&nbsp;&nbsp; T.
+Welch, “<i>A Technique for High-Performance Data Compression,</i>” Computer,
+June 1984.</span></p>
+
+<p style='margin-left:28.5pt;text-align:justify'><span style='font-size:10.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'>3.]&nbsp;&nbsp;<span
+class=apple-converted-space>&nbsp;</span>R. N. Horspool, “<i>Improving LZW</i>,”
+Proceedings of Data Compression Conference, DCC ’91, IEEE Computer Society
+Press, April 1991, pp. 332-341.</span></p>
+
+<p style='line-height:8.65pt'><b><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#CC0000'>&nbsp;</span></b></p>
+
+<p style='line-height:8.65pt'><b><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#CC0000'>Source Code:</span></b></p>
+
+<p style='margin-left:19.2pt;line-height:8.65pt'><b><span style='font-size:
+6.5pt;font-family:"Verdana","sans-serif";color:#FF9900'><a
+href="http://sites.google.com/site/compgt/LZW.zip">LZW.ZIP</a></span></b><span
+class=apple-converted-space><span style='font-size:6.5pt;font-family:"Verdana","sans-serif";
+color:#1C2023'>&nbsp;</span></span><span style='font-size:6.5pt;font-family:
+"Verdana","sans-serif";color:#1C2023'>- contains various implementations of LZW
+via (1) a ternary search tree (TST) data structure; (2) Unix's LZC hashing; and
+(3) a binary search tree (or BST), which is the fastest among the three.</span></p>
+
+<p style='margin-left:19.2pt;line-height:8.65pt'><span style='font-size:6.5pt;
+font-family:"Verdana","sans-serif";color:#1C2023'><a
+href="http://marknelson.us/">Mark Nelson</a><span class=apple-converted-space>&nbsp;</span>has
+written about<a href="http://marknelson.us/1989/10/01/lzw-data-compression/"><span
+class=apple-converted-space><span style='color:windowtext;text-decoration:none'>&nbsp;</span></span>LZW</a><span
+class=apple-converted-space>&nbsp;</span>in a DDJ article as early as 1989. The
+source code, which is based on Unix'<span class=apple-converted-space>&nbsp;</span><i>compress</i><span
+class=apple-converted-space>&nbsp;</span>(LZC) program, is also available.
+Needless to say, I've learned LZW from this article, a rare gem in the data
+compression literature.</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+</span></div>
+
+</body>
+
+</html>
